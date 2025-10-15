@@ -1,0 +1,53 @@
+# Import necessary libraries
+from sklearn.cluster import AgglomerativeClustering, KMeans
+from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
+from scipy.cluster.hierarchy import linkage, dendrogram
+import matplotlib.pyplot as plt
+
+# Agglomerative Hierarchical Clustering function
+def hierarchical_clustering(X, n_clusters=4, method='ward', metric='euclidean'):
+    model = AgglomerativeClustering(n_clusters=n_clusters, linkage=method, affinity=metric)
+    labels = model.fit_predict(X) 
+    return labels
+
+# K-means clustering function
+def kmeans_clustering(X, n_clusters=4):
+    model = KMeans(n_clusters=n_clusters, random_state=42) 
+    labels = model.fit_predict(X)
+    return labels
+
+# Function to evaluate clustering metrics
+def evaluate_clustering(X, labels, algorithm): 
+    silhouette = silhouette_score(X, labels) 
+    db_index = davies_bouldin_score(X, labels) 
+    ch_index = calinski_harabasz_score(X, labels)
+
+    print(f'Evaluation Metrics for {algorithm}:') 
+    print(f'Silhouette Score: {silhouette}') 
+    print(f'Davies-Bouldin Index: {db_index}') 
+    print(f'Calinski-Harabasz Index: {ch_index}\n')
+
+# Function to visualize hierarchical clustering dendrogram
+def hierarchical_dendrogram(X, method='ward', metric='euclidean'): 
+    linkage_matrix = linkage(X, method=method, metric=metric) 
+    dendrogram(linkage_matrix)
+    plt.title(f'Hierarchical Clustering - Method: {method}, Metric: {metric}')
+    plt.show()
+
+# Function to plot K-means clusters 
+def plot_kmeans_clusters(X, labels):
+    plt.scatter(X.iloc[:, 0], X.iloc[:, 1], c=labels, cmap='viridis', marker='o', edgecolors='k')
+    plt.title('K-Means Clustering') 
+    plt.xlabel('Feature 1')
+    plt.ylabel('Feature 2')
+    plt.show()
+
+# Apply Agglomerative Hierarchical Clustering 
+hierarchical_labels = hierarchical_clustering(X)
+evaluate_clustering(X, hierarchical_labels, 'Agglomerative Hierarchical Clustering')
+hierarchical_dendrogram(X)
+
+# Apply K-means clustering 
+kmeans_labels = kmeans_clustering(X)
+evaluate_clustering(X, kmeans_labels, 'K-Means Clustering') 
+plot_kmeans_clusters(X, kmeans_labels)
